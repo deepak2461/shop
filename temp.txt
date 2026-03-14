@@ -1,11 +1,15 @@
 
 python -m venv .venv
+(check python version it should be 3.12.12 if 3.9.x or 3.14.x fails with greenlet build tools issue while adding sqlalchemy)
 D:\Anthony Deepak\pro\shop>.venv\Scripts\activate
 uv init
 uv add Fastapi[standard]
 uv add -r requirements.txt
 
-
+alembic init alembic
+alembic upgrade head
+alembic downgrede
+alembic revision --autogenerate commit -m "commit msg"  # recheck
 
 
 
