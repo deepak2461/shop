@@ -66,3 +66,10 @@ def require_admin(current_user=Depends(get_current_user)):
     if current_user.get("role") != "admin":
         raise HTTPException(status_code=403, detail = " Admin privileges required")
     return current_user
+
+
+
+
+# # dependencies
+# db_dependency: Session = Depends(get_db)
+# authy_denedency: GetUserResponseOutModel = Depends(get_current_user)
