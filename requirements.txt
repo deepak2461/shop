@@ -1,0 +1,6 @@
+Fastapi[standard]
+uvicorn
+sqlalchemy
+psycopg2
+alembic
+

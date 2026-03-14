@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ShopWave</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.development.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a0f;
+    --surface: #13131a;
+    --surface2: #1c1c27;
+    --surface3: #252533;
+    --border: #2e2e40;
+    --accent: #7c6aff;
+    --accent2: #ff6a9d;
+    --accent3: #6affd4;
+    --text: #f0f0fa;
+    --text2: #9090b0;
+    --text3: #5a5a7a;
+    --success: #4ade80;
+    --warning: #fbbf24;
+    --danger: #f87171;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  html, body, #root { height: 100%; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.5; }
+  h1,h2,h3,h4,h5 { font-family: 'Syne', sans-serif; }
+  ::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg); } ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  input, textarea, select { outline: none; font-family: inherit; }
+  button { cursor: pointer; font-family: inherit; border: none; outline: none; }
+  a { text-decoration: none; color: inherit; }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes slideIn { from { transform: translateX(-16px); opacity:0; } to { transform:translateX(0); opacity:1; } }
+  @keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.4; } }
+  @keyframes shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+  @keyframes popIn { from { transform:scale(.85); opacity:0; } to { transform:scale(1); opacity:1; } }
+  @keyframes glow { 0%,100% { box-shadow:0 0 20px rgba(124,106,255,.2); } 50% { box-shadow:0 0 40px rgba(124,106,255,.5); } }
+
+  .fade-up { animation: fadeUp .4s ease forwards; }
+  .fade-in { animation: fadeIn .3s ease forwards; }
+
+  /* LAYOUT */
+  .app-shell { display:flex; flex-direction:column; min-height:100vh; }
+  .navbar { position:sticky; top:0; z-index:100; background:rgba(10,10,15,.85); backdrop-filter:blur(16px); border-bottom:1px solid var(--border); padding:0 24px; height:64px; display:flex; align-items:center; gap:16px; }
+  .navbar-brand { font-family:'Syne',sans-serif; font-weight:800; font-size:1.4rem; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; letter-spacing:-.5px; }
+  .navbar-spacer { flex:1; }
+  .nav-link { padding:6px 14px; border-radius:var(--radius-sm); font-size:.875rem; font-weight:500; color:var(--text2); transition:all .2s; cursor:pointer; }
+  .nav-link:hover, .nav-link.active { background:var(--surface2); color:var(--text); }
+  .nav-badge { position:relative; display:inline-flex; }
+  .badge { position:absolute; top:-6px; right:-6px; background:var(--accent2); color:#fff; border-radius:999px; font-size:.65rem; font-weight:700; min-width:16px; height:16px; display:flex; align-items:center; justify-content:center; padding:0 4px; }
+  .main { flex:1; padding:32px 24px; max-width:1200px; margin:0 auto; width:100%; }
+
+  /* BUTTONS */
+  .btn { display:inline-flex; align-items:center; gap:8px; padding:10px 20px; border-radius:var(--radius-sm); font-size:.875rem; font-weight:600; transition:all .2s; }
+  .btn-primary { background:var(--accent); color:#fff; }
+  .btn-primary:hover { background:#6b58f0; transform:translateY(-1px); box-shadow:0 8px 24px rgba(124,106,255,.4); }
+  .btn-secondary { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
+  .btn-secondary:hover { background:var(--surface3); border-color:var(--accent); }
+  .btn-danger { background:var(--danger); color:#fff; }
+  .btn-danger:hover { background:#ef4444; }
+  .btn-ghost { background:transparent; color:var(--text2); }
+  .btn-ghost:hover { background:var(--surface2); color:var(--text); }
+  .btn-sm { padding:6px 12px; font-size:.8rem; }
+  .btn-icon { padding:8px; border-radius:var(--radius-sm); background:var(--surface2); color:var(--text2); transition:all .2s; }
+  .btn-icon:hover { background:var(--surface3); color:var(--text); }
+  .btn:disabled { opacity:.5; cursor:not-allowed; transform:none!important; }
+
+  /* CARDS */
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  .card-hover { transition:all .25s; }
+  .card-hover:hover { border-color:var(--accent); transform:translateY(-3px); box-shadow:0 16px 40px rgba(0,0,0,.4); }
+  .card-body { padding:20px; }
+  .card-header { padding:16px 20px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+
+  /* FORMS */
+  .form-group { display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+  .form-label { font-size:.8rem; font-weight:600; color:var(--text2); letter-spacing:.05em; text-transform:uppercase; }
+  .form-input { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:10px 14px; color:var(--text); font-size:.875rem; transition:all .2s; width:100%; }
+  .form-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(124,106,255,.15); }
+  .form-input::placeholder { color:var(--text3); }
+  .form-select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239090b0' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; }
+
+  /* TAGS / CHIPS */
+  .chip { display:inline-flex; align-items:center; gap:4px; padding:3px 10px; border-radius:999px; font-size:.75rem; font-weight:600; }
+  .chip-accent { background:rgba(124,106,255,.15); color:var(--accent); }
+  .chip-success { background:rgba(74,222,128,.12); color:var(--success); }
+  .chip-danger { background:rgba(248,113,113,.12); color:var(--danger); }
+  .chip-warning { background:rgba(251,191,36,.12); color:var(--warning); }
+  .chip-pink { background:rgba(255,106,157,.12); color:var(--accent2); }
+
+  /* GRID */
+  .grid { display:grid; gap:20px; }
+  .grid-2 { grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); }
+  .grid-3 { grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); }
+  .grid-4 { grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); }
+  .stats-grid { grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); }
+
+  /* STAT CARD */
+  .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; }
+  .stat-card .stat-label { font-size:.8rem; color:var(--text2); text-transform:uppercase; letter-spacing:.08em; font-weight:600; margin-bottom:8px; }
+  .stat-card .stat-value { font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; }
+  .stat-card .stat-sub { font-size:.8rem; color:var(--text3); margin-top:4px; }
+  .stat-card .stat-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:1.1rem; margin-bottom:12px; }
+
+  /* PRODUCT CARD */
+  .product-card { animation: fadeUp .4s ease both; }
+  .product-img { aspect-ratio:1; background:var(--surface2); display:flex; align-items:center; justify-content:center; font-size:3rem; position:relative; overflow:hidden; }
+  .product-img::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(124,106,255,.05),rgba(255,106,157,.05)); }
+  .product-info { padding:14px; }
+  .product-name { font-family:'Syne',sans-serif; font-weight:700; font-size:.95rem; margin-bottom:4px; }
+  .product-cat { font-size:.75rem; color:var(--text3); margin-bottom:8px; }
+  .product-price { font-weight:700; font-size:1.1rem; color:var(--accent); }
+  .product-footer { padding:12px 14px; border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .stars { display:flex; gap:2px; color:var(--warning); font-size:.75rem; }
+
+  /* TABLE */
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:.875rem; }
+  thead tr { border-bottom:1px solid var(--border); }
+  thead th { padding:12px 16px; text-align:left; font-size:.75rem; text-transform:uppercase; letter-spacing:.08em; color:var(--text2); font-weight:600; }
+  tbody tr { border-bottom:1px solid rgba(46,46,64,.5); transition:background .15s; }
+  tbody tr:hover { background:var(--surface2); }
+  tbody td { padding:14px 16px; color:var(--text); }
+  tbody td:first-child { font-weight:500; }
+
+  /* MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter:blur(4px); z-index:200; display:flex; align-items:center; justify-content:center; padding:20px; animation:fadeIn .2s ease; }
+  .modal { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); width:100%; max-width:560px; max-height:90vh; overflow-y:auto; animation:popIn .25s ease; }
+  .modal-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .modal-title { font-family:'Syne',sans-serif; font-weight:700; font-size:1.1rem; }
+  .modal-body { padding:24px; }
+  .modal-footer { padding:16px 24px; border-top:1px solid var(--border); display:flex; gap:10px; justify-content:flex-end; }
+
+  /* TOAST */
+  .toast-stack { position:fixed; bottom:24px; right:24px; z-index:300; display:flex; flex-direction:column; gap:10px; }
+  .toast { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:12px 16px; display:flex; align-items:center; gap:10px; font-size:.875rem; max-width:320px; animation:slideIn .3s ease; box-shadow:0 8px 32px rgba(0,0,0,.4); }
+  .toast.success { border-left:3px solid var(--success); }
+  .toast.error { border-left:3px solid var(--danger); }
+  .toast.info { border-left:3px solid var(--accent); }
+
+  /* AUTH */
+  .auth-wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--bg); position:relative; overflow:hidden; }
+  .auth-bg { position:absolute; inset:0; background:radial-gradient(ellipse at 30% 50%, rgba(124,106,255,.12) 0%, transparent 60%), radial-gradient(ellipse at 70% 20%, rgba(255,106,157,.08) 0%, transparent 50%); pointer-events:none; }
+  .auth-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:40px; width:100%; max-width:420px; position:relative; z-index:1; animation:fadeUp .5s ease; }
+  .auth-logo { font-family:'Syne',sans-serif; font-size:1.8rem; font-weight:800; background:linear-gradient(135deg,var(--accent),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; text-align:center; margin-bottom:8px; }
+  .auth-sub { text-align:center; color:var(--text2); font-size:.875rem; margin-bottom:32px; }
+  .auth-tabs { display:flex; background:var(--surface2); border-radius:var(--radius-sm); padding:4px; margin-bottom:24px; }
+  .auth-tab { flex:1; padding:8px; border-radius:6px; font-size:.875rem; font-weight:600; text-align:center; cursor:pointer; color:var(--text2); transition:all .2s; }
+  .auth-tab.active { background:var(--surface3); color:var(--text); box-shadow:0 2px 8px rgba(0,0,0,.3); }
+  .auth-role-pick { display:flex; gap:10px; margin-bottom:24px; }
+  .role-option { flex:1; padding:12px; border-radius:var(--radius-sm); border:1.5px solid var(--border); cursor:pointer; text-align:center; transition:all .2s; }
+  .role-option .role-icon { font-size:1.5rem; margin-bottom:4px; }
+  .role-option .role-name { font-size:.8rem; font-weight:600; color:var(--text2); }
+  .role-option.selected { border-color:var(--accent); background:rgba(124,106,255,.1); }
+  .role-option.selected .role-name { color:var(--accent); }
+  .auth-hint { background:var(--surface2); border-radius:var(--radius-sm); padding:10px 14px; font-size:.8rem; color:var(--text2); margin-bottom:20px; border-left:3px solid var(--accent); }
+
+  /* PAGE HEADER */
+  .page-header { margin-bottom:28px; }
+  .page-header h1 { font-size:1.8rem; font-weight:800; margin-bottom:4px; }
+  .page-header p { color:var(--text2); font-size:.9rem; }
+  .page-actions { display:flex; gap:10px; align-items:center; }
+  .flex-between { display:flex; align-items:center; justify-content:space-between; }
+  .flex-center { display:flex; align-items:center; }
+  .gap-2 { gap:8px; } .gap-3 { gap:12px; } .gap-4 { gap:16px; }
+  .mt-1 { margin-top:4px; } .mt-2 { margin-top:8px; } .mt-3 { margin-top:12px; } .mt-4 { margin-top:16px; } .mt-6 { margin-top:24px; }
+  .mb-2 { margin-bottom:8px; } .mb-4 { margin-bottom:16px; } .mb-6 { margin-bottom:24px; }
+  .text-sm { font-size:.8rem; } .text-xs { font-size:.75rem; } .text-muted { color:var(--text2); }
+  .text-accent { color:var(--accent); } .text-success { color:var(--success); } .text-danger { color:var(--danger); }
+  .font-bold { font-weight:700; } .font-mono { font-family:monospace; }
+  .w-full { width:100%; }
+
+  /* SEARCH BAR */
+  .search-bar { display:flex; align-items:center; gap:10px; background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:0 14px; transition:border-color .2s; flex:1; max-width:400px; }
+  .search-bar:focus-within { border-color:var(--accent); }
+  .search-bar input { flex:1; background:transparent; border:none; color:var(--text); padding:10px 0; font-size:.875rem; }
+  .search-icon { color:var(--text3); font-size:.9rem; }
+
+  /* CART SIDEBAR */
+  .cart-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:150; animation:fadeIn .2s; }
+  .cart-panel { position:fixed; right:0; top:0; bottom:0; width:380px; background:var(--surface); border-left:1px solid var(--border); z-index:160; display:flex; flex-direction:column; animation:slideRight .3s ease; }
+  @keyframes slideRight { from { transform:translateX(100%); } to { transform:translateX(0); } }
+  .cart-header { padding:20px 24px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; }
+  .cart-items { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .cart-item { display:flex; gap:12px; background:var(--surface2); border-radius:var(--radius-sm); padding:12px; }
+  .cart-item-img { width:56px; height:56px; background:var(--surface3); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; flex-shrink:0; }
+  .cart-item-info { flex:1; min-width:0; }
+  .cart-item-name { font-weight:600; font-size:.875rem; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .cart-item-price { font-size:.8rem; color:var(--text2); }
+  .qty-ctrl { display:flex; align-items:center; gap:8px; margin-top:8px; }
+  .qty-btn { width:24px; height:24px; border-radius:6px; background:var(--surface3); color:var(--text); font-size:.9rem; display:flex; align-items:center; justify-content:center; font-weight:700; border:1px solid var(--border); cursor:pointer; transition:all .2s; }
+  .qty-btn:hover { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .cart-footer { padding:20px 24px; border-top:1px solid var(--border); }
+  .cart-total { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+  .cart-total-label { font-size:.9rem; color:var(--text2); }
+  .cart-total-value { font-family:'Syne',sans-serif; font-size:1.4rem; font-weight:800; }
+  .empty-state { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding:40px; text-align:center; }
+  .empty-icon { font-size:3rem; opacity:.4; }
+  .empty-title { font-family:'Syne',sans-serif; font-weight:700; color:var(--text2); }
+  .empty-sub { font-size:.85rem; color:var(--text3); }
+
+  /* PRODUCT DETAIL */
+  .product-detail { display:grid; grid-template-columns:1fr 1fr; gap:40px; animation:fadeUp .4s ease; }
+  @media (max-width:700px) { .product-detail { grid-template-columns:1fr; } }
+  .product-detail-img { aspect-ratio:1; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; font-size:6rem; }
+  .product-detail-info h1 { font-size:1.6rem; font-weight:800; margin-bottom:8px; }
+  .product-detail-price { font-size:2rem; font-weight:800; color:var(--accent); margin:16px 0; }
+  .review-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:14px; }
+  .review-author { font-weight:600; font-size:.875rem; margin-bottom:4px; }
+  .review-text { font-size:.85rem; color:var(--text2); line-height:1.6; }
+
+  /* SIDEBAR NAV (admin) */
+  .admin-layout { display:flex; min-height:calc(100vh - 64px); }
+  .sidebar { width:220px; flex-shrink:0; background:var(--surface); border-right:1px solid var(--border); padding:20px 12px; display:flex; flex-direction:column; gap:4px; }
+  .sidebar-item { display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:var(--radius-sm); font-size:.875rem; font-weight:500; color:var(--text2); cursor:pointer; transition:all .2s; }
+  .sidebar-item:hover { background:var(--surface2); color:var(--text); }
+  .sidebar-item.active { background:rgba(124,106,255,.15); color:var(--accent); font-weight:600; }
+  .sidebar-item .si-icon { width:18px; text-align:center; }
+  .admin-content { flex:1; padding:32px; overflow-y:auto; }
+  .sidebar-section { font-size:.7rem; text-transform:uppercase; letter-spacing:.1em; color:var(--text3); font-weight:700; padding:12px 12px 6px; margin-top:8px; }
+
+  /* ORDER STATUS */
+  .order-status { display:flex; gap:0; margin:20px 0; }
+  .order-step { flex:1; position:relative; display:flex; flex-direction:column; align-items:center; }
+  .order-step::before { content:''; position:absolute; top:14px; left:50%; right:-50%; height:2px; background:var(--border); z-index:0; }
+  .order-step:last-child::before { display:none; }
+  .order-step-dot { width:28px; height:28px; border-radius:50%; background:var(--surface2); border:2px solid var(--border); z-index:1; display:flex; align-items:center; justify-content:center; font-size:.7rem; font-weight:700; margin-bottom:8px; }
+  .order-step.done .order-step-dot { background:var(--success); border-color:var(--success); color:#fff; }
+  .order-step.active .order-step-dot { background:var(--accent); border-color:var(--accent); color:#fff; animation:glow 2s infinite; }
+  .order-step-label { font-size:.7rem; color:var(--text2); text-align:center; }
+  .order-step.done .order-step-label, .order-step.active .order-step-label { color:var(--text); font-weight:600; }
+
+  /* MISC */
+  .divider { height:1px; background:var(--border); margin:20px 0; }
+  .alert { padding:12px 16px; border-radius:var(--radius-sm); font-size:.875rem; margin-bottom:16px; }
+  .alert-info { background:rgba(124,106,255,.1); border:1px solid rgba(124,106,255,.3); color:var(--accent); }
+  .pagination { display:flex; gap:6px; align-items:center; margin-top:20px; }
+  .page-btn { width:32px; height:32px; border-radius:var(--radius-sm); background:var(--surface2); border:1px solid var(--border); color:var(--text2); font-size:.8rem; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:all .2s; }
+  .page-btn.active, .page-btn:hover { background:var(--accent); border-color:var(--accent); color:#fff; }
+  .progress-bar { height:6px; background:var(--surface3); border-radius:999px; overflow:hidden; margin-top:4px; }
+  .progress-fill { height:100%; border-radius:999px; transition:width .5s ease; }
+  .skeleton { background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: var(--radius-sm); }
+  .filter-bar { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+  .filter-chip { padding:6px 14px; border-radius:999px; font-size:.8rem; font-weight:600; background:var(--surface2); border:1px solid var(--border); color:var(--text2); cursor:pointer; transition:all .2s; }
+  .filter-chip:hover, .filter-chip.active { background:rgba(124,106,255,.15); border-color:var(--accent); color:var(--accent); }
+  .stock-bar { display:flex; align-items:center; gap:8px; font-size:.75rem; color:var(--text2); }
+
+  @media (max-width:600px) {
+    .main { padding:20px 16px; }
+    .sidebar { display:none; }
+    .admin-content { padding:20px 16px; }
+    .product-detail { grid-template-columns:1fr; }
+    .stats-grid { grid-template-columns:repeat(2,1fr); }
+    .cart-panel { width:100%; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useContext, createContext, useCallback, useRef } = React;
+
+/* ===================== MOCK API =====================
+ * Replace these functions with real FastAPI calls like:
+ * const res = await fetch('http://localhost:8000/api/products');
+ * const data = await res.json();
+ */
+const delay = (ms) => new Promise(r => setTimeout(r, ms));
+
+const MOCK_PRODUCTS = [
+  { id:1, name:'Wireless Headphones', category:'Electronics', price:129.99, stock:45, sold:234, emoji:'🎧', rating:4.5, reviews:128, description:'Premium noise-cancelling wireless headphones with 30hr battery life and studio-quality sound.' },
+  { id:2, name:'Mechanical Keyboard', category:'Electronics', price:89.99, stock:32, sold:189, emoji:'⌨️', rating:4.8, reviews:95, description:'Tactile mechanical switches, RGB backlight, and aluminium build for the ultimate typing experience.' },
+  { id:3, name:'Running Shoes', category:'Sports', price:74.99, stock:67, sold:312, emoji:'👟', rating:4.3, reviews:203, description:'Lightweight breathable mesh upper with responsive foam midsole for daily training.' },
+  { id:4, name:'Coffee Maker', category:'Kitchen', price:59.99, stock:23, sold:156, emoji:'☕', rating:4.6, reviews:87, description:'Brew perfect pour-over style coffee with programmable strength settings and thermal carafe.' },
+  { id:5, name:'Yoga Mat', category:'Sports', price:34.99, stock:89, sold:421, emoji:'🧘', rating:4.4, reviews:267, description:'Non-slip eco-friendly TPE material, 6mm thick for joint protection and lasting comfort.' },
+  { id:6, name:'Desk Lamp', category:'Home', price:44.99, stock:56, sold:178, emoji:'💡', rating:4.2, reviews:64, description:'LED desk lamp with 5 colour temperatures, USB-C charging port and touch dimmer.' },
+  { id:7, name:'Water Bottle', category:'Sports', price:24.99, stock:134, sold:567, emoji:'🫙', rating:4.7, reviews:342, description:'Insulated stainless steel keeps drinks cold 24hr, hot 12hr. Leak-proof lid.' },
+  { id:8, name:'Notebook Set', category:'Stationery', price:19.99, stock:200, sold:389, emoji:'📓', rating:4.5, reviews:156, description:'Set of 3 premium ruled notebooks with lay-flat binding and thick 120gsm paper.' },
+  { id:9, name:'Plant Pot', category:'Home', price:29.99, stock:78, sold:145, emoji:'🪴', rating:4.3, reviews:72, description:'Handcrafted ceramic with drainage hole and bamboo saucer. Suits plants up to 6 inch.' },
+  { id:10, name:'Sunglasses', category:'Fashion', price:49.99, stock:41, sold:213, emoji:'🕶️', rating:4.6, reviews:119, description:'UV400 polarised lenses in acetate frame. Comes with microfiber pouch and hard case.' },
+  { id:11, name:'Bluetooth Speaker', category:'Electronics', price:79.99, stock:29, sold:198, emoji:'🔊', rating:4.7, reviews:143, description:'360° room-filling sound, IPX7 waterproof, 20hr playtime and fast USB-C charging.' },
+  { id:12, name:'Scented Candle', category:'Home', price:18.99, stock:112, sold:456, emoji:'🕯️', rating:4.8, reviews:288, description:'Hand-poured soy wax with lavender & cedarwood fragrance. 50hr burn time.' },
+];
+
+const MOCK_ORDERS = [
+  { id:'ORD-1001', customer:'Alice Johnson', email:'alice@example.com', items:3, total:214.97, status:'delivered', date:'2026-03-10' },
+  { id:'ORD-1002', customer:'Bob Smith', email:'bob@example.com', items:1, total:89.99, status:'shipped', date:'2026-03-11' },
+  { id:'ORD-1003', customer:'Carol White', email:'carol@example.com', items:2, total:104.98, status:'processing', date:'2026-03-12' },
+  { id:'ORD-1004', customer:'Dave Brown', email:'dave@example.com', items:4, total:289.96, status:'pending', date:'2026-03-12' },
+  { id:'ORD-1005', customer:'Eva Green', email:'eva@example.com', items:2, total:154.98, status:'delivered', date:'2026-03-09' },
+];
+
+const MOCK_REVIEWS = [
+  { id:1, productId:1, user:'Alex M.', rating:5, text:'Incredible sound quality! The noise cancellation is top-notch.', date:'2026-03-05' },
+  { id:2, productId:1, user:'Sarah K.', rating:4, text:'Very comfortable for long sessions. Battery lasts forever.', date:'2026-03-01' },
+  { id:3, productId:1, user:'Tom R.', rating:5, text:'Best headphones I have owned. Worth every penny.', date:'2026-02-28' },
+];
+
+const API = {
+  // AUTH
+  login: async (email, password, role) => {
+    await delay(600);
+    // TODO: replace with → POST /api/auth/login
+    if (password.length < 3) throw new Error('Invalid credentials');
+    return { token: 'mock_jwt_token', user: { id: role === 'admin' ? 1 : 2, name: email.split('@')[0], email, role } };
+  },
+  register: async (name, email, password) => {
+    await delay(800);
+    // TODO: replace with → POST /api/auth/register
+    return { token: 'mock_jwt_token', user: { id: 99, name, email, role: 'customer' } };
+  },
+
+  // PRODUCTS
+  getProducts: async (params = {}) => {
+    await delay(300);
+    // TODO: replace with → GET /api/products?category=...&search=...&page=...
+    let products = [...MOCK_PRODUCTS];
+    if (params.search) products = products.filter(p => p.name.toLowerCase().includes(params.search.toLowerCase()));
+    if (params.category && params.category !== 'All') products = products.filter(p => p.category === params.category);
+    return { products, total: products.length };
+  },
+  getProduct: async (id) => {
+    await delay(200);
+    // TODO: replace with → GET /api/products/{id}
+    return MOCK_PRODUCTS.find(p => p.id === id);
+  },
+  createProduct: async (data) => {
+    await delay(500);
+    // TODO: replace with → POST /api/products  (admin only)
+    const newProduct = { ...data, id: Date.now(), sold: 0, rating: 0, reviews: 0 };
+    MOCK_PRODUCTS.push(newProduct);
+    return newProduct;
+  },
+  updateProduct: async (id, data) => {
+    await delay(400);
+    // TODO: replace with → PUT /api/products/{id}  (admin only)
+    const idx = MOCK_PRODUCTS.findIndex(p => p.id === id);
+    if (idx !== -1) Object.assign(MOCK_PRODUCTS[idx], data);
+    return MOCK_PRODUCTS[idx];
+  },
+  deleteProduct: async (id) => {
+    await delay(300);
+    // TODO: replace with → DELETE /api/products/{id}  (admin only)
+    const idx = MOCK_PRODUCTS.findIndex(p => p.id === id);
+    if (idx !== -1) MOCK_PRODUCTS.splice(idx, 1);
+    return { success: true };
+  },
+
+  // ORDERS
+  getOrders: async () => {
+    await delay(400);
+    // TODO: replace with → GET /api/orders  (admin: all, customer: own)
+    return MOCK_ORDERS;
+  },
+  updateOrderStatus: async (id, status) => {
+    await delay(300);
+    // TODO: replace with → PATCH /api/orders/{id}/status  (admin only)
+    const order = MOCK_ORDERS.find(o => o.id === id);
+    if (order) order.status = status;
+    return order;
+  },
+  placeOrder: async (cart) => {
+    await delay(800);
+    // TODO: replace with → POST /api/orders
+    const total = cart.reduce((s, i) => s + i.price * i.qty, 0);
+    return { id: `ORD-${Date.now()}`, total, status: 'pending', date: new Date().toISOString().split('T')[0] };
+  },
+
+  // REVIEWS
+  getReviews: async (productId) => {
+    await delay(200);
+    // TODO: replace with → GET /api/products/{id}/reviews
+    return MOCK_REVIEWS.filter(r => r.productId === productId);
+  },
+  addReview: async (productId, data) => {
+    await delay(400);
+    // TODO: replace with → POST /api/products/{id}/reviews
+    const r = { ...data, id: Date.now(), productId, date: new Date().toISOString().split('T')[0] };
+    MOCK_REVIEWS.push(r);
+    return r;
+  },
+
+  // ANALYTICS (admin)
+  getSalesStats: async () => {
+    await delay(400);
+    // TODO: replace with → GET /api/analytics/sales
+    return { revenue: 48291.50, orders: 1247, customers: 834, avgOrder: 38.73, growth: 12.4 };
+  },
+};
+
+/* ===================== CONTEXTS ===================== */
+const AuthCtx = createContext(null);
+const CartCtx = createContext(null);
+const ToastCtx = createContext(null);
+
+function ToastProvider({ children }) {
+  const [toasts, setToasts] = useState([]);
+  const addToast = useCallback((msg, type = 'info') => {
+    const id = Date.now();
+    setToasts(t => [...t, { id, msg, type }]);
+    setTimeout(() => setToasts(t => t.filter(x => x.id !== id)), 3500);
+  }, []);
+  const icons = { success: '✓', error: '✗', info: 'ℹ' };
+  return (
+    <ToastCtx.Provider value={addToast}>
+      {children}
+      <div className="toast-stack">
+        {toasts.map(t => (
+          <div key={t.id} className={`toast ${t.type}`}>
+            <span style={{fontSize:'1rem'}}>{icons[t.type]}</span>
+            <span>{t.msg}</span>
+          </div>
+        ))}
+      </div>
+    </ToastCtx.Provider>
+  );
+}
+
+function AuthProvider({ children }) {
+  const [user, setUser] = useState(null);
+  const login = (userData) => setUser(userData);
+  const logout = () => setUser(null);
+  return <AuthCtx.Provider value={{ user, login, logout }}>{children}</AuthCtx.Provider>;
+}
+
+function CartProvider({ children }) {
+  const [items, setItems] = useState([]);
+  const [open, setOpen] = useState(false);
+  const addItem = (product) => {
+    setItems(prev => {
+      const ex = prev.find(i => i.id === product.id);
+      return ex ? prev.map(i => i.id === product.id ? {...i, qty: i.qty + 1} : i)
+                : [...prev, {...product, qty: 1}];
+    });
+  };
+  const removeItem = (id) => setItems(prev => prev.filter(i => i.id !== id));
+  const updateQty = (id, qty) => {
+    if (qty < 1) return removeItem(id);
+    setItems(prev => prev.map(i => i.id === id ? {...i, qty} : i));
+  };
+  const clear = () => setItems([]);
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+  const count = items.reduce((s, i) => s + i.qty, 0);
+  return (
+    <CartCtx.Provider value={{ items, addItem, removeItem, updateQty, clear, total, count, open, setOpen }}>
+      {children}
+    </CartCtx.Provider>
+  );
+}
+
+/* ===================== ICONS (inline SVG) ===================== */
+const Icon = ({ name, size = 16 }) => {
+  const icons = {
+    cart: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>,
+    package: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m7.5 4.27 9 5.15M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/></svg>,
+    orders: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>,
+    chart: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>,
+    users: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+    search: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>,
+    plus: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    edit: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>,
+    trash: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>,
+    x: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    star: <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+    arrow: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>,
+    logout: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+    home: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>,
+    settings: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+  };
+  return icons[name] || null;
+};
+
+/* ===================== STARS ===================== */
+const Stars = ({ rating, size = 12 }) => (
+  <div className="stars" style={{fontSize:size}}>
+    {[1,2,3,4,5].map(i => (
+      <span key={i} style={{color: i <= Math.round(rating) ? 'var(--warning)' : 'var(--surface3)'}}>★</span>
+    ))}
+  </div>
+);
+
+/* ===================== LOADING ===================== */
+const Spinner = () => (
+  <div style={{display:'flex',alignItems:'center',justifyContent:'center',padding:'48px'}}>
+    <div style={{width:28,height:28,border:'3px solid var(--border)',borderTopColor:'var(--accent)',borderRadius:'50%',animation:'spin .7s linear infinite'}}/>
+  </div>
+);
+
+/* ===================== AUTH PAGE ===================== */
+function AuthPage() {
+  const [tab, setTab] = useState('login');
+  const [role, setRole] = useState('customer');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const { login } = useContext(AuthCtx);
+  const addToast = useContext(ToastCtx);
+
+  const handleSubmit = async () => {
+    setError(''); setLoading(true);
+    try {
+      if (tab === 'login') {
+        const res = await API.login(email || `${role}@demo.com`, password || '1234', role);
+        login(res.user);
+        addToast(`Welcome back, ${res.user.name}!`, 'success');
+      } else {
+        const res = await API.register(name, email, password);
+        login(res.user);
+        addToast('Account created!', 'success');
+      }
+    } catch(e) { setError(e.message); }
+    setLoading(false);
+  };
+
+  return (
+    <div className="auth-wrap">
+      <div className="auth-bg"/>
+      <div className="auth-card">
+        <div className="auth-logo">ShopWave</div>
+        <div className="auth-sub">Your premium shopping destination</div>
+        <div className="auth-tabs">
+          <div className={`auth-tab ${tab==='login'?'active':''}`} onClick={()=>setTab('login')}>Sign In</div>
+          <div className={`auth-tab ${tab==='register'?'active':''}`} onClick={()=>setTab('register')}>Register</div>
+        </div>
+
+        {tab === 'login' && (
+          <>
+            <div className="auth-role-pick">
+              <div className={`role-option ${role==='customer'?'selected':''}`} onClick={()=>setRole('customer')}>
+                <div className="role-icon">🛍️</div>
+                <div className="role-name">Customer</div>
+              </div>
+              <div className={`role-option ${role==='admin'?'selected':''}`} onClick={()=>setRole('admin')}>
+                <div className="role-icon">🛠️</div>
+                <div className="role-name">Admin</div>
+              </div>
+            </div>
+            <div className="auth-hint">
+              Demo: click a role above then hit Sign In — no real credentials needed.
+            </div>
+          </>
+        )}
+
+        {tab === 'register' && (
+          <div className="form-group">
+            <label className="form-label">Full Name</label>
+            <input className="form-input" placeholder="Your name" value={name} onChange={e=>setName(e.target.value)}/>
+          </div>
+        )}
+        <div className="form-group">
+          <label className="form-label">Email</label>
+          <input className="form-input" type="email" placeholder={`${role}@demo.com`} value={email} onChange={e=>setEmail(e.target.value)}/>
+        </div>
+        <div className="form-group" style={{marginBottom:20}}>
+          <label className="form-label">Password</label>
+          <input className="form-input" type="password" placeholder="••••••••" value={password} onChange={e=>setPassword(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleSubmit()}/>
+        </div>
+        {error && <div style={{color:'var(--danger)',fontSize:'.85rem',marginBottom:12}}>{error}</div>}
+        <button className="btn btn-primary w-full" style={{justifyContent:'center',padding:'12px'}} onClick={handleSubmit} disabled={loading}>
+          {loading ? <div style={{width:16,height:16,border:'2px solid rgba(255,255,255,.4)',borderTopColor:'#fff',borderRadius:'50%',animation:'spin .7s linear infinite'}}/> : null}
+          {tab === 'login' ? 'Sign In' : 'Create Account'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ===================== NAVBAR ===================== */
+function Navbar({ page, setPage }) {
+  const { user, logout } = useContext(AuthCtx);
+  const { count, setOpen } = useContext(CartCtx);
+  return (
+    <nav className="navbar">
+      <div className="navbar-brand" onClick={()=>setPage('home')} style={{cursor:'pointer'}}>ShopWave</div>
+      <div className="navbar-spacer"/>
+      {user?.role === 'customer' && (
+        <>
+          <span className={`nav-link ${page==='shop'?'active':''}`} onClick={()=>setPage('shop')}>Shop</span>
+          <span className={`nav-link ${page==='orders'?'active':''}`} onClick={()=>setPage('orders')}>My Orders</span>
+          <div className="nav-badge">
+            <button className="btn-icon" onClick={()=>setOpen(true)}><Icon name="cart" size={18}/></button>
+            {count > 0 && <div className="badge">{count}</div>}
+          </div>
+        </>
+      )}
+      {user?.role === 'admin' && (
+        <>
+          <span className={`nav-link ${page==='admin'?'active':''}`} onClick={()=>setPage('admin')}>Dashboard</span>
+        </>
+      )}
+      <div style={{display:'flex',alignItems:'center',gap:8,marginLeft:8}}>
+        <div style={{width:30,height:30,borderRadius:'50%',background:'linear-gradient(135deg,var(--accent),var(--accent2))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.75rem',fontWeight:700,color:'#fff'}}>
+          {user?.name?.[0]?.toUpperCase()}
+        </div>
+        <button className="btn-icon" onClick={logout} title="Sign out"><Icon name="logout" size={15}/></button>
+      </div>
+    </nav>
+  );
+}
+
+/* ===================== CART PANEL ===================== */
+function CartPanel() {
+  const { items, removeItem, updateQty, total, open, setOpen, clear } = useContext(CartCtx);
+  const { user } = useContext(AuthCtx);
+  const addToast = useContext(ToastCtx);
+  const [loading, setLoading] = useState(false);
+
+  const checkout = async () => {
+    setLoading(true);
+    try {
+      const order = await API.placeOrder(items);
+      clear(); setOpen(false);
+      addToast(`Order ${order.id} placed! Total: $${order.total.toFixed(2)}`, 'success');
+    } catch(e) { addToast('Checkout failed', 'error'); }
+    setLoading(false);
+  };
+
+  if (!open) return null;
+  return (
+    <>
+      <div className="cart-overlay" onClick={()=>setOpen(false)}/>
+      <div className="cart-panel">
+        <div className="cart-header">
+          <h3 style={{fontFamily:'Syne',fontWeight:700}}>Cart {items.length > 0 && <span style={{color:'var(--text2)',fontWeight:400,fontSize:'.85rem'}}>({items.length} items)</span>}</h3>
+          <button className="btn-icon" onClick={()=>setOpen(false)}><Icon name="x" size={16}/></button>
+        </div>
+        {items.length === 0 ? (
+          <div className="empty-state">
+            <div className="empty-icon">🛒</div>
+            <div className="empty-title">Your cart is empty</div>
+            <div className="empty-sub">Add some products to get started</div>
+          </div>
+        ) : (
+          <>
+            <div className="cart-items">
+              {items.map(item => (
+                <div key={item.id} className="cart-item">
+                  <div className="cart-item-img">{item.emoji}</div>
+                  <div className="cart-item-info">
+                    <div className="cart-item-name">{item.name}</div>
+                    <div className="cart-item-price">${(item.price * item.qty).toFixed(2)}</div>
+                    <div className="qty-ctrl">
+                      <button className="qty-btn" onClick={()=>updateQty(item.id, item.qty-1)}>−</button>
+                      <span style={{fontSize:'.85rem',fontWeight:600,minWidth:20,textAlign:'center'}}>{item.qty}</span>
+                      <button className="qty-btn" onClick={()=>updateQty(item.id, item.qty+1)}>+</button>
+                      <button className="btn-ghost btn-sm" style={{marginLeft:'auto',padding:'4px 6px'}} onClick={()=>removeItem(item.id)}><Icon name="trash" size={13}/></button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="cart-footer">
+              <div className="cart-total">
+                <span className="cart-total-label">Total</span>
+                <span className="cart-total-value">${total.toFixed(2)}</span>
+              </div>
+              <button className="btn btn-primary w-full" style={{justifyContent:'center'}} onClick={checkout} disabled={loading}>
+                {loading ? '⏳ Placing order...' : '🎉 Checkout'}
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+/* ===================== HOME PAGE ===================== */
+function HomePage({ setPage }) {
+  const { user } = useContext(AuthCtx);
+  const cats = ['Electronics','Sports','Kitchen','Home','Fashion','Stationery'];
+  return (
+    <div className="fade-up">
+      <div style={{textAlign:'center',padding:'48px 0 40px',position:'relative'}}>
+        <div style={{position:'absolute',inset:0,background:'radial-gradient(ellipse at 50% 100%, rgba(124,106,255,.12) 0%, transparent 70%)',pointerEvents:'none'}}/>
+        <div style={{display:'inline-block',background:'rgba(124,106,255,.15)',borderRadius:'999px',padding:'4px 14px',fontSize:'.75rem',fontWeight:700,color:'var(--accent)',marginBottom:16,letterSpacing:'.1em',textTransform:'uppercase'}}>
+          New arrivals every week
+        </div>
+        <h1 style={{fontFamily:'Syne',fontSize:'clamp(2rem,5vw,3.5rem)',fontWeight:800,lineHeight:1.1,marginBottom:16}}>
+          Discover Products<br/>
+          <span style={{background:'linear-gradient(135deg,var(--accent),var(--accent2))',WebkitBackgroundClip:'text',WebkitTextFillColor:'transparent'}}>You'll Love</span>
+        </h1>
+        <p style={{color:'var(--text2)',fontSize:'1.05rem',maxWidth:500,margin:'0 auto 28px'}}>
+          Curated selection across electronics, sports, home goods and more — all in one place.
+        </p>
+        <button className="btn btn-primary" style={{padding:'12px 28px',fontSize:'1rem'}} onClick={()=>setPage('shop')}>
+          Browse Shop →
+        </button>
+      </div>
+
+      <div className="divider"/>
+      <h2 style={{fontFamily:'Syne',fontWeight:700,marginBottom:16}}>Shop by Category</h2>
+      <div className="grid grid-4" style={{marginBottom:40}}>
+        {cats.map(cat => (
+          <div key={cat} className="card card-hover" style={{cursor:'pointer',padding:'20px',textAlign:'center'}} onClick={()=>setPage('shop')}>
+            <div style={{fontSize:'2rem',marginBottom:8}}>{({Electronics:'⚡',Sports:'🏃',Kitchen:'🍳',Home:'🏠',Fashion:'👗',Stationery:'📝'})[cat]}</div>
+            <div style={{fontFamily:'Syne',fontWeight:700,fontSize:'.9rem'}}>{cat}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ===================== SHOP PAGE ===================== */
+function ShopPage() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('All');
+  const [selected, setSelected] = useState(null);
+  const { addItem } = useContext(CartCtx);
+  const addToast = useContext(ToastCtx);
+  const cats = ['All','Electronics','Sports','Kitchen','Home','Fashion','Stationery'];
+
+  useEffect(() => {
+    setLoading(true);
+    API.getProducts({ search, category }).then(d => { setProducts(d.products); setLoading(false); });
+  }, [search, category]);
+
+  const handleAdd = (p, e) => {
+    e.stopPropagation();
+    addItem(p);
+    addToast(`${p.name} added to cart`, 'success');
+  };
+
+  if (selected) return <ProductDetail product={selected} onBack={()=>setSelected(null)} />;
+
+  return (
+    <div className="fade-in">
+      <div className="flex-between mb-4">
+        <div className="page-header" style={{marginBottom:0}}>
+          <h1>Shop</h1>
+          <p>{products.length} products</p>
+        </div>
+      </div>
+      <div className="flex-center gap-3 mb-4" style={{flexWrap:'wrap'}}>
+        <div className="search-bar">
+          <span className="search-icon"><Icon name="search" size={14}/></span>
+          <input placeholder="Search products..." value={search} onChange={e=>setSearch(e.target.value)}/>
+        </div>
+      </div>
+      <div className="filter-bar">
+        {cats.map(c => (
+          <div key={c} className={`filter-chip ${category===c?'active':''}`} onClick={()=>setCategory(c)}>{c}</div>
+        ))}
+      </div>
+      {loading ? <Spinner/> : (
+        <div className="grid grid-3">
+          {products.map((p, i) => (
+            <div key={p.id} className="card card-hover product-card" style={{animationDelay:`${i*0.04}s`,cursor:'pointer'}} onClick={()=>setSelected(p)}>
+              <div className="product-img">{p.emoji}</div>
+              <div className="product-info">
+                <div className="product-name">{p.name}</div>
+                <div className="product-cat">{p.category}</div>
+                <div style={{display:'flex',alignItems:'center',gap:8}}>
+                  <Stars rating={p.rating}/>
+                  <span style={{fontSize:'.75rem',color:'var(--text3)'}}>({p.reviews})</span>
+                </div>
+              </div>
+              <div className="product-footer">
+                <div className="product-price">${p.price}</div>
+                <button className="btn btn-primary btn-sm" onClick={e=>handleAdd(p,e)}>
+                  <Icon name="plus" size={12}/> Add
+                </button>
+              </div>
+            </div>
+          ))}
+          {products.length === 0 && (
+            <div style={{gridColumn:'1/-1',textAlign:'center',padding:'60px 0',color:'var(--text2)'}}>
+              <div style={{fontSize:'3rem',marginBottom:12}}>🔍</div>
+              <div style={{fontFamily:'Syne',fontWeight:700}}>No products found</div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ===================== PRODUCT DETAIL ===================== */
+function ProductDetail({ product, onBack }) {
+  const [reviews, setReviews] = useState([]);
+  const [newReview, setNewReview] = useState({ text:'', rating:5 });
+  const [loading, setLoading] = useState(false);
+  const [qty, setQty] = useState(1);
+  const { addItem } = useContext(CartCtx);
+  const { user } = useContext(AuthCtx);
+  const addToast = useContext(ToastCtx);
+
+  useEffect(() => {
+    API.getReviews(product.id).then(setReviews);
+  }, [product.id]);
+
+  const handleAddCart = () => {
+    for(let i=0;i<qty;i++) addItem(product);
+    addToast(`${product.name} ×${qty} added to cart`, 'success');
+  };
+
+  const submitReview = async () => {
+    if (!newReview.text.trim()) return;
+    setLoading(true);
+    const r = await API.addReview(product.id, { ...newReview, user: user.name });
+    setReviews(prev => [r, ...prev]);
+    setNewReview({ text:'', rating:5 });
+    setLoading(false);
+    addToast('Review submitted!', 'success');
+  };
+
+  return (
+    <div className="fade-in">
+      <button className="btn btn-ghost btn-sm mb-6" onClick={onBack}><Icon name="arrow" size={14}/> Back to Shop</button>
+      <div className="product-detail">
+        <div className="product-detail-img">{product.emoji}</div>
+        <div className="product-detail-info">
+          <span className="chip chip-accent">{product.category}</span>
+          <h1 className="mt-2">{product.name}</h1>
+          <div style={{display:'flex',alignItems:'center',gap:10,marginTop:8}}>
+            <Stars rating={product.rating} size={14}/>
+            <span style={{fontSize:'.85rem',color:'var(--text2)'}}>{product.rating} ({product.reviews} reviews)</span>
+          </div>
+          <div className="product-detail-price">${product.price}</div>
+          <p style={{color:'var(--text2)',lineHeight:1.8,marginBottom:20}}>{product.description}</p>
+          <div className="stock-bar mb-4">
+            <span>In stock:</span>
+            <div className="progress-bar" style={{flex:1}}>
+              <div className="progress-fill" style={{width:`${Math.min(100,(product.stock/100)*100)}%`,background:'var(--success)'}}/>
+            </div>
+            <span className="font-bold text-sm">{product.stock} left</span>
+          </div>
+          <div style={{display:'flex',gap:12,alignItems:'center'}}>
+            <div className="qty-ctrl">
+              <button className="qty-btn" style={{width:32,height:32}} onClick={()=>setQty(q=>Math.max(1,q-1))}>−</button>
+              <span style={{fontWeight:700,fontSize:'1rem',minWidth:28,textAlign:'center'}}>{qty}</span>
+              <button className="qty-btn" style={{width:32,height:32}} onClick={()=>setQty(q=>q+1)}>+</button>
+            </div>
+            <button className="btn btn-primary" onClick={handleAddCart}><Icon name="cart" size={16}/> Add to Cart</button>
+          </div>
+        </div>
+      </div>
+
+      <div className="divider"/>
+      <h2 style={{fontFamily:'Syne',fontWeight:700,marginBottom:20}}>Reviews</h2>
+      <div className="card card-body mb-6">
+        <h4 style={{fontFamily:'Syne',fontWeight:700,marginBottom:16}}>Leave a Review</h4>
+        <div className="form-group">
+          <label className="form-label">Rating</label>
+          <div style={{display:'flex',gap:6}}>
+            {[1,2,3,4,5].map(s => (
+              <button key={s} onClick={()=>setNewReview(r=>({...r,rating:s}))} style={{fontSize:'1.4rem',background:'none',border:'none',cursor:'pointer',color:s<=newReview.rating?'var(--warning)':'var(--surface3)',transition:'color .15s'}}>★</button>
+            ))}
+          </div>
+        </div>
+        <div className="form-group">
+          <label className="form-label">Your Review</label>
+          <textarea className="form-input" rows={3} placeholder="What do you think about this product?" value={newReview.text} onChange={e=>setNewReview(r=>({...r,text:e.target.value}))} style={{resize:'vertical'}}/>
+        </div>
+        <button className="btn btn-primary btn-sm" onClick={submitReview} disabled={loading}>Submit Review</button>
+      </div>
+
+      <div style={{display:'flex',flexDirection:'column',gap:12}}>
+        {reviews.map(r => (
+          <div key={r.id} className="review-card">
+            <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:8}}>
+              <div style={{width:28,height:28,borderRadius:'50%',background:'linear-gradient(135deg,var(--accent),var(--accent2))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.75rem',fontWeight:700,color:'#fff'}}>{r.user[0]}</div>
+              <div>
+                <div className="review-author">{r.user}</div>
+                <div style={{display:'flex',gap:4}}>
+                  <Stars rating={r.rating} size={11}/>
+                  <span style={{fontSize:'.7rem',color:'var(--text3)'}}>{r.date}</span>
+                </div>
+              </div>
+            </div>
+            <p className="review-text">{r.text}</p>
+          </div>
+        ))}
+        {reviews.length === 0 && <p style={{color:'var(--text3)',fontSize:'.875rem'}}>No reviews yet. Be the first!</p>}
+      </div>
+    </div>
+  );
+}
+
+/* ===================== CUSTOMER ORDERS PAGE ===================== */
+function CustomerOrdersPage() {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    API.getOrders().then(d => { setOrders(d.slice(0,3)); setLoading(false); });
+  }, []);
+
+  const statusColors = { pending:'warning', processing:'accent', shipped:'pink', delivered:'success' };
+  const orderSteps = ['pending','processing','shipped','delivered'];
+
+  return (
+    <div className="fade-in">
+      <div className="page-header">
+        <h1>My Orders</h1>
+        <p>Track and manage your orders</p>
+      </div>
+      {loading ? <Spinner/> : (
+        <div style={{display:'flex',flexDirection:'column',gap:16}}>
+          {orders.map(o => (
+            <div key={o.id} className="card">
+              <div className="card-header">
+                <div>
+                  <span style={{fontFamily:'Syne',fontWeight:700}}>{o.id}</span>
+                  <span style={{marginLeft:12,fontSize:'.8rem',color:'var(--text3)'}}>{o.date}</span>
+                </div>
+                <span className={`chip chip-${statusColors[o.status]||'accent'}`}>{o.status}</span>
+              </div>
+              <div className="card-body">
+                <div style={{display:'flex',justifyContent:'space-between',marginBottom:20}}>
+                  <span className="text-muted text-sm">{o.items} item{o.items>1?'s':''}</span>
+                  <span style={{fontFamily:'Syne',fontWeight:700,fontSize:'1.1rem'}}>${o.total.toFixed(2)}</span>
+                </div>
+                <div className="order-status">
+                  {orderSteps.map(step => {
+                    const doneIdx = orderSteps.indexOf(o.status);
+                    const stepIdx = orderSteps.indexOf(step);
+                    const state = stepIdx < doneIdx ? 'done' : stepIdx === doneIdx ? 'active' : '';
+                    return (
+                      <div key={step} className={`order-step ${state}`}>
+                        <div className="order-step-dot">{state==='done'?'✓':stepIdx+1}</div>
+                        <div className="order-step-label" style={{textTransform:'capitalize'}}>{step}</div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ===================== ADMIN DASHBOARD ===================== */
+function AdminDashboard() {
+  const [section, setSection] = useState('overview');
+
+  const navItems = [
+    { id:'overview', icon:'home', label:'Overview' },
+    { id:'products', icon:'package', label:'Products' },
+    { id:'orders', icon:'orders', label:'Orders' },
+    { id:'customers', icon:'users', label:'Customers' },
+    { id:'analytics', icon:'chart', label:'Analytics' },
+  ];
+
+  return (
+    <div className="admin-layout" style={{margin:'-32px -24px',minHeight:'calc(100vh - 64px)'}}>
+      <div className="sidebar">
+        <div style={{fontFamily:'Syne',fontWeight:700,fontSize:'.8rem',color:'var(--text3)',padding:'8px 12px 16px',textTransform:'uppercase',letterSpacing:'.1em'}}>Admin Panel</div>
+        {navItems.map(item => (
+          <div key={item.id} className={`sidebar-item ${section===item.id?'active':''}`} onClick={()=>setSection(item.id)}>
+            <span className="si-icon"><Icon name={item.icon} size={15}/></span>
+            {item.label}
+          </div>
+        ))}
+      </div>
+      <div className="admin-content">
+        {section === 'overview' && <AdminOverview />}
+        {section === 'products' && <AdminProducts />}
+        {section === 'orders' && <AdminOrders />}
+        {section === 'customers' && <AdminCustomers />}
+        {section === 'analytics' && <AdminAnalytics />}
+      </div>
+    </div>
+  );
+}
+
+function AdminOverview() {
+  const [stats, setStats] = useState(null);
+  useEffect(() => { API.getSalesStats().then(setStats); }, []);
+  if (!stats) return <Spinner/>;
+  return (
+    <div className="fade-in">
+      <div className="page-header">
+        <h1>Overview</h1>
+        <p>Welcome back. Here's what's happening today.</p>
+      </div>
+      <div className="grid stats-grid mb-6">
+        {[
+          { label:'Total Revenue', value:`$${stats.revenue.toLocaleString()}`, sub:'All time', icon:'💰', color:'var(--accent)' },
+          { label:'Total Orders', value:stats.orders.toLocaleString(), sub:`+${stats.growth}% this month`, icon:'📦', color:'var(--accent2)' },
+          { label:'Customers', value:stats.customers.toLocaleString(), sub:'Registered users', icon:'👥', color:'var(--accent3)' },
+          { label:'Avg. Order', value:`$${stats.avgOrder}`, sub:'Per transaction', icon:'📊', color:'var(--warning)' },
+        ].map(s => (
+          <div key={s.label} className="stat-card fade-up">
+            <div className="stat-icon" style={{background:`${s.color}18`}}><span style={{fontSize:'1.2rem'}}>{s.icon}</span></div>
+            <div className="stat-label">{s.label}</div>
+            <div className="stat-value" style={{color:s.color}}>{s.value}</div>
+            <div className="stat-sub">{s.sub}</div>
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-2">
+        <div className="card">
+          <div className="card-header"><h3 style={{fontFamily:'Syne',fontWeight:700,fontSize:'1rem'}}>Recent Orders</h3></div>
+          <div className="table-wrap">
+            <table>
+              <thead><tr><th>Order</th><th>Customer</th><th>Total</th><th>Status</th></tr></thead>
+              <tbody>
+                {MOCK_ORDERS.slice(0,4).map(o => (
+                  <tr key={o.id}>
+                    <td>{o.id}</td>
+                    <td>{o.customer}</td>
+                    <td>${o.total.toFixed(2)}</td>
+                    <td><span className={`chip chip-${{pending:'warning',processing:'accent',shipped:'pink',delivered:'success'}[o.status]}`}>{o.status}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-header"><h3 style={{fontFamily:'Syne',fontWeight:700,fontSize:'1rem'}}>Top Products</h3></div>
+          <div style={{padding:'12px 0'}}>
+            {MOCK_PRODUCTS.sort((a,b)=>b.sold-a.sold).slice(0,5).map(p => (
+              <div key={p.id} style={{display:'flex',alignItems:'center',gap:12,padding:'10px 20px'}}>
+                <span style={{fontSize:'1.2rem'}}>{p.emoji}</span>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{fontWeight:600,fontSize:'.875rem',whiteSpace:'nowrap',overflow:'hidden',textOverflow:'ellipsis'}}>{p.name}</div>
+                  <div className="progress-bar mt-1"><div className="progress-fill" style={{width:`${(p.sold/600)*100}%`,background:'var(--accent)'}}/></div>
+                </div>
+                <div style={{fontSize:'.8rem',color:'var(--text2)',flexShrink:0}}>{p.sold} sold</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AdminProducts() {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [modal, setModal] = useState(null); // null | 'create' | product
+  const [form, setForm] = useState({ name:'',category:'Electronics',price:'',stock:'',emoji:'📦',description:'' });
+  const addToast = useContext(ToastCtx);
+
+  useEffect(() => { API.getProducts().then(d => { setProducts(d.products); setLoading(false); }); }, []);
+
+  const openEdit = (p) => { setForm({name:p.name,category:p.category,price:p.price,stock:p.stock,emoji:p.emoji,description:p.description||''}); setModal(p); };
+  const openCreate = () => { setForm({name:'',category:'Electronics',price:'',stock:'',emoji:'📦',description:''}); setModal('create'); };
+
+  const save = async () => {
+    const data = {...form, price:parseFloat(form.price), stock:parseInt(form.stock)};
+    if (modal === 'create') {
+      const p = await API.createProduct(data);
+      setProducts(prev => [...prev, p]);
+      addToast('Product created!', 'success');
+    } else {
+      const p = await API.updateProduct(modal.id, data);
+      setProducts(prev => prev.map(x => x.id===modal.id ? {...x,...data} : x));
+      addToast('Product updated!', 'success');
+    }
+    setModal(null);
+  };
+
+  const del = async (id, name) => {
+    if (!confirm(`Delete "${name}"?`)) return;
+    await API.deleteProduct(id);
+    setProducts(prev => prev.filter(p => p.id !== id));
+    addToast('Product deleted', 'info');
+  };
+
+  return (
+    <div className="fade-in">
+      <div className="flex-between mb-6">
+        <div className="page-header" style={{marginBottom:0}}>
+          <h1>Products</h1>
+          <p>Manage your inventory</p>
+        </div>
+        <button className="btn btn-primary" onClick={openCreate}><Icon name="plus" size={14}/> Add Product</button>
+      </div>
+      {loading ? <Spinner/> : (
+        <div className="card">
+          <div className="table-wrap">
+            <table>
+              <thead><tr><th>Product</th><th>Category</th><th>Price</th><th>Stock</th><th>Sold</th><th>Rating</th><th>Actions</th></tr></thead>
+              <tbody>
+                {products.map(p => (
+                  <tr key={p.id}>
+                    <td><div style={{display:'flex',alignItems:'center',gap:10}}><span style={{fontSize:'1.2rem'}}>{p.emoji}</span><span>{p.name}</span></div></td>
+                    <td><span className="chip chip-accent">{p.category}</span></td>
+                    <td style={{fontWeight:600}}>${p.price}</td>
+                    <td><span className={`chip ${p.stock < 30 ? 'chip-danger':'chip-success'}`}>{p.stock}</span></td>
+                    <td style={{color:'var(--text2)'}}>{p.sold}</td>
+                    <td><Stars rating={p.rating} size={11}/></td>
+                    <td>
+                      <div style={{display:'flex',gap:6}}>
+                        <button className="btn-icon" onClick={()=>openEdit(p)} title="Edit"><Icon name="edit" size={13}/></button>
+                        <button className="btn-icon" style={{color:'var(--danger)'}} onClick={()=>del(p.id,p.name)} title="Delete"><Icon name="trash" size={13}/></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {modal && (
+        <div className="modal-overlay" onClick={()=>setModal(null)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <div className="modal-header">
+              <div className="modal-title">{modal==='create'?'Add Product':'Edit Product'}</div>
+              <button className="btn-icon" onClick={()=>setModal(null)}><Icon name="x" size={15}/></button>
+            </div>
+            <div className="modal-body">
+              <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'0 16px'}}>
+                <div className="form-group" style={{gridColumn:'1/-1'}}>
+                  <label className="form-label">Name</label>
+                  <input className="form-input" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Product name"/>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Category</label>
+                  <select className="form-input form-select" value={form.category} onChange={e=>setForm(f=>({...f,category:e.target.value}))}>
+                    {['Electronics','Sports','Kitchen','Home','Fashion','Stationery'].map(c=><option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Emoji</label>
+                  <input className="form-input" value={form.emoji} onChange={e=>setForm(f=>({...f,emoji:e.target.value}))} placeholder="📦"/>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Price ($)</label>
+                  <input className="form-input" type="number" value={form.price} onChange={e=>setForm(f=>({...f,price:e.target.value}))} placeholder="0.00"/>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Stock</label>
+                  <input className="form-input" type="number" value={form.stock} onChange={e=>setForm(f=>({...f,stock:e.target.value}))} placeholder="0"/>
+                </div>
+                <div className="form-group" style={{gridColumn:'1/-1'}}>
+                  <label className="form-label">Description</label>
+                  <textarea className="form-input" rows={3} value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} style={{resize:'vertical'}}/>
+                </div>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-secondary" onClick={()=>setModal(null)}>Cancel</button>
+              <button className="btn btn-primary" onClick={save}>Save Product</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AdminOrders() {
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const addToast = useContext(ToastCtx);
+
+  useEffect(() => { API.getOrders().then(d => { setOrders(d); setLoading(false); }); }, []);
+
+  const changeStatus = async (id, status) => {
+    await API.updateOrderStatus(id, status);
+    setOrders(prev => prev.map(o => o.id===id ? {...o,status} : o));
+    addToast(`Order ${id} updated to "${status}"`, 'success');
+  };
+
+  const statuses = ['pending','processing','shipped','delivered'];
+  const statusColors = { pending:'warning', processing:'accent', shipped:'pink', delivered:'success' };
+
+  return (
+    <div className="fade-in">
+      <div className="page-header">
+        <h1>Orders</h1>
+        <p>Manage and fulfil customer orders</p>
+      </div>
+      {loading ? <Spinner/> : (
+        <div className="card">
+          <div className="table-wrap">
+            <table>
+              <thead><tr><th>Order ID</th><th>Customer</th><th>Email</th><th>Items</th><th>Total</th><th>Date</th><th>Status</th></tr></thead>
+              <tbody>
+                {orders.map(o => (
+                  <tr key={o.id}>
+                    <td style={{fontFamily:'monospace',fontSize:'.8rem'}}>{o.id}</td>
+                    <td>{o.customer}</td>
+                    <td style={{color:'var(--text2)',fontSize:'.8rem'}}>{o.email}</td>
+                    <td>{o.items}</td>
+                    <td style={{fontWeight:600}}>${o.total.toFixed(2)}</td>
+                    <td style={{color:'var(--text2)',fontSize:'.8rem'}}>{o.date}</td>
+                    <td>
+                      <select className="form-input form-select" value={o.status} onChange={e=>changeStatus(o.id,e.target.value)}
+                        style={{padding:'4px 28px 4px 10px',fontSize:'.8rem',width:'auto',borderRadius:'999px'}}>
+                        {statuses.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase()+s.slice(1)}</option>)}
+                      </select>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function AdminCustomers() {
+  const customers = [
+    { id:1, name:'Alice Johnson', email:'alice@example.com', orders:8, spent:892.40, joined:'2025-11-15', status:'active' },
+    { id:2, name:'Bob Smith', email:'bob@example.com', orders:3, spent:234.97, joined:'2026-01-08', status:'active' },
+    { id:3, name:'Carol White', email:'carol@example.com', orders:12, spent:1420.88, joined:'2025-09-20', status:'active' },
+    { id:4, name:'Dave Brown', email:'dave@example.com', orders:1, spent:89.99, joined:'2026-03-01', status:'new' },
+    { id:5, name:'Eva Green', email:'eva@example.com', orders:5, spent:567.35, joined:'2025-12-10', status:'active' },
+  ];
+
+  return (
+    <div className="fade-in">
+      <div className="page-header">
+        <h1>Customers</h1>
+        <p>{customers.length} registered users</p>
+      </div>
+      <div className="card">
+        <div className="table-wrap">
+          <table>
+            <thead><tr><th>Customer</th><th>Email</th><th>Orders</th><th>Total Spent</th><th>Joined</th><th>Status</th></tr></thead>
+            <tbody>
+              {customers.map(c => (
+                <tr key={c.id}>
+                  <td>
+                    <div style={{display:'flex',alignItems:'center',gap:10}}>
+                      <div style={{width:30,height:30,borderRadius:'50%',background:'linear-gradient(135deg,var(--accent),var(--accent2))',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'.75rem',fontWeight:700,color:'#fff'}}>{c.name[0]}</div>
+                      {c.name}
+                    </div>
+                  </td>
+                  <td style={{color:'var(--text2)',fontSize:'.85rem'}}>{c.email}</td>
+                  <td>{c.orders}</td>
+                  <td style={{fontWeight:600,color:'var(--accent)'}}>${c.spent.toFixed(2)}</td>
+                  <td style={{color:'var(--text2)',fontSize:'.8rem'}}>{c.joined}</td>
+                  <td><span className={`chip ${c.status==='active'?'chip-success':'chip-warning'}`}>{c.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AdminAnalytics() {
+  const monthlyData = [
+    { month:'Oct', revenue:28400, orders:712 },
+    { month:'Nov', revenue:34200, orders:891 },
+    { month:'Dec', revenue:52800, orders:1340 },
+    { month:'Jan', revenue:31600, orders:820 },
+    { month:'Feb', revenue:39100, orders:987 },
+    { month:'Mar', revenue:48291, orders:1247 },
+  ];
+  const maxRev = Math.max(...monthlyData.map(d=>d.revenue));
+  const catData = [
+    { cat:'Electronics', pct:35, color:'var(--accent)' },
+    { cat:'Sports', pct:22, color:'var(--accent2)' },
+    { cat:'Home', pct:18, color:'var(--accent3)' },
+    { cat:'Kitchen', pct:13, color:'var(--warning)' },
+    { cat:'Other', pct:12, color:'var(--text3)' },
+  ];
+
+  return (
+    <div className="fade-in">
+      <div className="page-header">
+        <h1>Analytics</h1>
+        <p>Sales performance and insights</p>
+      </div>
+      <div className="card mb-6">
+        <div className="card-header"><h3 style={{fontFamily:'Syne',fontWeight:700,fontSize:'1rem'}}>Monthly Revenue</h3></div>
+        <div style={{padding:'24px 24px 16px',display:'flex',alignItems:'flex-end',gap:12,height:200}}>
+          {monthlyData.map(d => (
+            <div key={d.month} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:6,height:'100%',justifyContent:'flex-end'}}>
+              <span style={{fontSize:'.65rem',color:'var(--text2)',fontWeight:600}}>${(d.revenue/1000).toFixed(0)}k</span>
+              <div style={{width:'100%',background:'linear-gradient(180deg,var(--accent),var(--accent2))',borderRadius:'6px 6px 0 0',height:`${(d.revenue/maxRev)*130}px`,transition:'height .5s ease',position:'relative',opacity:.85}}/>
+              <span style={{fontSize:'.7rem',color:'var(--text3)'}}>{d.month}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="grid grid-2">
+        <div className="card">
+          <div className="card-header"><h3 style={{fontFamily:'Syne',fontWeight:700,fontSize:'1rem'}}>Sales by Category</h3></div>
+          <div style={{padding:'16px 24px',display:'flex',flexDirection:'column',gap:12}}>
+            {catData.map(d => (
+              <div key={d.cat}>
+                <div style={{display:'flex',justifyContent:'space-between',fontSize:'.85rem',marginBottom:6}}>
+                  <span>{d.cat}</span><span style={{fontWeight:700,color:d.color}}>{d.pct}%</span>
+                </div>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{width:`${d.pct}%`,background:d.color}}/>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="card">
+          <div className="card-header"><h3 style={{fontFamily:'Syne',fontWeight:700,fontSize:'1rem'}}>Key Metrics</h3></div>
+          <div style={{padding:'20px 24px',display:'flex',flexDirection:'column',gap:16}}>
+            {[
+              {label:'Conversion Rate', value:'3.2%', change:'+0.4%', up:true},
+              {label:'Return Rate', value:'8.1%', change:'-1.2%', up:true},
+              {label:'Avg. Session Duration', value:'4m 32s', change:'+22s', up:true},
+              {label:'Cart Abandonment', value:'62.4%', change:'-3.1%', up:true},
+            ].map(m => (
+              <div key={m.label} style={{display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid var(--border)',paddingBottom:14}}>
+                <span style={{fontSize:'.875rem',color:'var(--text2)'}}>{m.label}</span>
+                <div style={{display:'flex',gap:10,alignItems:'center'}}>
+                  <span style={{fontFamily:'Syne',fontWeight:700}}>{m.value}</span>
+                  <span style={{fontSize:'.75rem',color:m.up?'var(--success)':'var(--danger)',fontWeight:600}}>{m.change}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ===================== APP ROOT ===================== */
+function App() {
+  const { user } = useContext(AuthCtx);
+  const [page, setPage] = useState('home');
+
+  if (!user) return <AuthPage/>;
+
+  return (
+    <div className="app-shell">
+      <Navbar page={page} setPage={setPage}/>
+      {user.role === 'customer' ? (
+        <>
+          <CartPanel/>
+          <div className="main">
+            {page === 'home' && <HomePage setPage={setPage}/>}
+            {page === 'shop' && <ShopPage/>}
+            {page === 'orders' && <CustomerOrdersPage/>}
+          </div>
+        </>
+      ) : (
+        <div className="main" style={{maxWidth:'100%',padding:0}}>
+          <AdminDashboard/>
+        </div>
+      )}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <ToastProvider>
+    <AuthProvider>
+      <CartProvider>
+        <App/>
+      </CartProvider>
+    </AuthProvider>
+  </ToastProvider>
+);
+</script>
+</body>
+</html>

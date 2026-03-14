@@ -1,3 +1,14 @@
+
+python -m venv .venv
+D:\Anthony Deepak\pro\shop>.venv\Scripts\activate
+uv init
+uv add Fastapi[standard]
+uv add -r requirements.txt
+
+
+
+
+
 D:\Anthony Deepak\pro\shop>python -m venv .venv
 
 D:\Anthony Deepak\pro\shop>.venv\Scripts\activate
