@@ -12,7 +12,7 @@ class Users(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String, nullable=False)
-    username = Column(String, nullable=False, unique=True)
+    username = Column(String, nullable=True, unique=True)
     email = Column(String, nullable=False, unique=True)
     password = Column(String, nullable=False)
     role : enums.UserRole = Column(String, nullable=False, default="customer")

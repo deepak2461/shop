@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 
 import enums
+import schemas.gen
 #from auth.security import create_access_token, hash_password
 
 class UserSigninReq(BaseModel):
@@ -24,8 +25,24 @@ class UserRegisterReq(BaseModel):
         if len(value)<3:
             raise ValueError("pwd must be more than 3 chars")
         return value
+    
+    model_config = {
+        "from_attributes": True
+    }
 
 
+class UserSigninRes(schemas.gen.BaseResponseSchema):
+    token : str
+
+class UserRegisterRes(schemas.gen.BaseResponseSchema):
+    token : str
+    created_at : datetime = Field(default_factory = datetime.now)
+
+    model_config = {                # It tells Pydantic: If input is an object, read its attributes instead of expecting dict.
+        "from_attributes": True     # This configuration allows Pydantic to create a User model instance from an instance of the db_models.User class, which is useful when retrieving user data from the database and returning it in the API response.
+    }
+
+'''
 class UserSigninRes(UserSigninReq):
     token : str         #= Field(default_factory = lambda: create_access_token({"sub": "user_id"}))
     id : int
@@ -34,12 +51,15 @@ class UserRegisterRes(UserRegisterReq):
     token : str         #= Field(default_factory = lambda: create_access_token({"sub": "user_id"}))
     id : int
     username : str
-    created_at : datetime = Field(default_factory = datetime.now())
+    created_at : datetime = Field(default_factory = datetime.now)
 
-    model_config = {                # It tells Pydantic: If input is an object, read its attributes instead of expecting dict.
-        "from_attributes": True     # This configuration allows Pydantic to create a User model instance from an instance of the db_models.User class, which is useful when retrieving user data from the database and returning it in the API response.
+    model_config = {                
+        "from_attributes": True     
     }
 
+
+
+'''
 
 
 '''

@@ -13,10 +13,12 @@ uv init
 uv add Fastapi[standard]
 uv add -r requirements.txt
 
+
 alembic init alembic
+#update alembic/env.py file as shown below
+alembic revision --autogenerate -m "commit msg"  # recheck
 alembic upgrade head
 alembic downgrede
-alembic revision --autogenerate commit -m "commit msg"  # recheck
 
 ======================================================================
 

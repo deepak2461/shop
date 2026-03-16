@@ -21,17 +21,22 @@ from passlib.context import CryptContext
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 
+import hashlib
+
 
 SECRET_KEY = "DEEPAK"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")       #https://youtu.be/7t2alSnE2-I?si=c8Vu5jMVABHBxnXU&t=8890
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")       #https://youtu.be/7t2alSnE2-I?si=c8Vu5jMVABHBxnXU&t=8890
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 def hash_password(password: str):
+    #password_hash = hashlib.sha256(password.encode()).hexdigest()    # Added due to -- ValueError: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
+    #print("original:", password, len(password))                        # Due to above error changed bcrypt to argon2
+    #print("sha256:", password_hash, len(password_hash))
     return pwd_context.hash(password)
 
 
