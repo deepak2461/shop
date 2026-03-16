@@ -5,3 +5,5 @@ psycopg2
 alembic
 python-jose
 passlib
+bcrypt
+argon2_cffi
