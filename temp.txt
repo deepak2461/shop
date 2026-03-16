@@ -1,4 +1,11 @@
 
+TODO
+user.py -- pydantic models added, add similarly for other , 
+then create tables in schemas.py --> allembic --> testitout
+
+
+================================  SETUP  ======================================
+
 python -m venv .venv
 (check python version it should be 3.12.12 if 3.9.x or 3.14.x fails with greenlet build tools issue while adding sqlalchemy)
 D:\Anthony Deepak\pro\shop>.venv\Scripts\activate
@@ -11,7 +18,7 @@ alembic upgrade head
 alembic downgrede
 alembic revision --autogenerate commit -m "commit msg"  # recheck
 
-
+======================================================================
 
 D:\Anthony Deepak\pro\shop>python -m venv .venv
 
@@ -74,3 +81,204 @@ Installed 44 packages in 3.84s
  + uvicorn==0.39.0
  + watchfiles==1.1.1
  + websockets==15.0.1
+
+
+
+
+
+
+
+
+
+
+ ===============================   DRAFTS  ===================================
+
+ 
+
+
+
+app
+│
+├── main.py
+│
+├── auth
+│   ├── config.py
+│   ├── security.py
+│   └── dependencies.py
+│
+├── db
+│   ├── session.py
+│   └── base.py
+│
+├── models
+│   ├── user.py
+│   ├── product.py
+│   ├── category.py
+│   ├── order.py
+│   ├── order_item.py
+│   └── review.py
+│
+├── schemas
+│   ├── auth.py
+│   ├── product.py
+│   ├── order.py
+│   ├── review.py
+│   └── customer.py
+│
+├── routers
+│   ├── auth.py
+│   ├── products.py
+│   ├── orders.py
+│   ├── reviews.py
+│   ├── analytics.py
+│   └── customers.py
+│
+├── services
+│   ├── auth_service.py
+│   ├── product_service.py
+│   ├── order_service.py
+│   └── review_service.py
+│
+└── utils
+    ├── hashing.py
+    └── helpers.py
+	
+	
+	
+	
+| Feature                | Endpoints                        | Router file    |
+| ---------------------- | -------------------------------- | -------------- |
+| Authentication         | login, register                  | `auth.py`      |
+| Products               | list, create, update, delete     | `products.py`  |
+| Orders                 | list, place order, update status | `orders.py`    |
+| Reviews                | add + fetch reviews              | `reviews.py`   |
+| Analytics              | sales + reports                  | `analytics.py` |
+| Customers (admin view) | list customers                   | `customers.py` |
+
+
+
+users
+------
+id
+name
+email
+password      hashed pwd
+role          (admin / customer) default - customer
+created_at
+
+
+
+products
+---------
+id	int	—	Unique product identifier
+name	string	—	Product name
+category	string	—	Category label
+price	float	—	Price in USD (2 decimal places)
+stock	int	—	Available stock count
+sold	int	—	Total units sold
+emoji	string	—	Single emoji used as product thumbnail
+rating	float	—	Average rating 0–5
+reviews	int	—	Total review count
+description	string	—	Long-form product description
+created_at	string	—	ISO 8601 timestamp
+
+
+
+
+reviews
+---------
+id
+product_id
+user_id
+rating
+text
+created_at
+
+
+orders
+--------
+id                (ORD-1001 style string)
+user_id
+status          (enum --- "pending" | "processing" | "shipped" | "delivered")
+total
+item_count
+created_at
+
+
+order_items
+-------------
+id
+order_id
+product_id
+name_snapshot
+price_snapshot
+qty
+subtotal
+
+
+
+
+categories
+-----------
+id
+name
+
+============================ ROUTES ====================================
+
+1.  Authentication
+POST /auth/login
+POST /auth/register
+
+
+2.  Products
+GET /products
+GET /products/{id}
+POST /products			🔐 Auth: Protected — Admin JWT required
+PUT /products/{id}		🔐 Auth: Protected — Admin JWT required
+DELETE /products/{id}	🔐 Auth: Protected — Admin JWT required	
+
+
+3.  Orders
+POST /orders				🔐 Auth: Protected — Customer JWT required
+GET /orders					🔐 Auth: Protected — JWT required. Admins see all orders; customers see only their own.
+PATCH /orders/{id}/status   🔐 Auth: Protected — Admin JWT required
+
+
+4.  Reviews
+GET	/api/products/{id}/reviews	
+POST	/api/products/{id}/reviews	 🔐 Auth: Protected — Customer JWT required. One review per customer per product.
+
+
+5.  Analytics  (Admin only)
+GET /analytics/sales		🔐 Auth: Protected — Admin JWT required
+GET /analytics/monthly		🔐 Auth: Protected — Admin JWT required
+GET /analytics/categories	🔐 Auth: Protected — Admin JWT required
+
+
+6.  Customers  (Admin only)
+GET	/customers	🔐 Auth: Protected — Admin JWT required
+
+
+
+
+
+•	API.login          		→ POST /api/auth/login
+•	API.register       		→ POST /api/auth/register
+•	API.getProducts    		→ GET  /api/products
+•	API.getProduct     		→ GET  /api/products/{id}
+•	API.createProduct  		→ POST /api/products
+•	API.updateProduct  		→ PUT  /api/products/{id}
+•	API.deleteProduct  		→ DELETE /api/products/{id}
+•	API.getOrders      		→ GET  /api/orders
+•	API.placeOrder     		→ POST /api/orders
+•	API.updateOrderStatus 	→ PATCH /api/orders/{id}/status
+•	API.getReviews     		→ GET  /api/products/{id}/reviews
+•	API.addReview      		→ POST /api/products/{id}/reviews
+•	API.getSalesStats  		→ GET  /api/analytics/sales
+
+
+
+
+
+
+
