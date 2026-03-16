@@ -5,7 +5,7 @@
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 
-from .. import enums
+import enums
 #from auth.security import create_access_token, hash_password
 
 class UserSigninReq(BaseModel):
