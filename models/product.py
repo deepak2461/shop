@@ -38,9 +38,9 @@ class Product(Base):
     sold = Column(Integer, nullable=False, default=0)
     emoji = Column(String, nullable=True)
     rating = Column(Float, nullable=True, default = 0 )
-    reviews = Column(Integer, nullable=True)
-    description = Column(String, nullable=False)
-    created_at = Column(DateTime, default=datetime.now)
+    reviews = Column(Integer, nullable=True, default = 0 )
+    description = Column(String, nullable=False, default = "No description")
+    created_at = Column(DateTime, nullable=True,default=datetime.now)
 
     category = relationship("Category", back_populates="products")
 

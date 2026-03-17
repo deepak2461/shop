@@ -14,12 +14,16 @@ import services.auth
 from auth.security import hash_password, verify_password, create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
 from db.session import get_db
 from sqlalchemy.orm import Session
-
+from fastapi.security import OAuth2PasswordRequestForm
+from typing import Optional
 
 router = APIRouter(prefix="/auth")
 
 @router.post("/login" , response_model = UserSigninRes)
-def login(request_model : UserSigninReq ,role : str, email:str, password:str, db : Session = Depends(get_db)):
+def login( request_model : OAuth2PasswordRequestForm = Depends() , db : Session = Depends(get_db)):   # def login(request_model : UserSigninReq ,role : str, email:str, password:str, db : Session = Depends(get_db)):
+    email = request_model.username
+    password = request_model.password
+
     if not services.auth.user_exists(email, db):
         raise HTTPException(status_code=400, detail="User does not exist")
     else:
@@ -27,9 +31,12 @@ def login(request_model : UserSigninReq ,role : str, email:str, password:str, db
         if not verify_password(password, user.password):
             raise HTTPException(status_code=401, detail="Invalid Credentials")
         else:
-            access_token = create_access_token(request_model.model_dump())
+            data = {"email": email} 
+            access_token = create_access_token(data)          #access_token = create_access_token(request_model.model_dump())
 
-            return {"data": request_model.model_dump(exclude={"password"}), "message": f"User logged in successfully","token": access_token}
+            return {"data": data, "message": f"User logged in successfully","token": access_token}    #return {"data": request_model.model_dump(exclude={"password"}), "message": f"User logged in successfully","token": access_token}
+
+            
 
 
 

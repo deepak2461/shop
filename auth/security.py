@@ -31,7 +31,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")       #https://youtu.be/7t2alSnE2-I?si=c8Vu5jMVABHBxnXU&t=8890
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 def hash_password(password: str):
     #password_hash = hashlib.sha256(password.encode()).hexdigest()    # Added due to -- ValueError: password cannot be longer than 72 bytes, truncate manually if necessary (e.g. my_password[:72])
@@ -72,7 +72,12 @@ def require_admin(current_user=Depends(get_current_user)):
         raise HTTPException(status_code=403, detail = " Admin privileges required")
     return current_user
 
-
+def require_role(role: str):
+    def role_checker(current_user=Depends(get_current_user)):
+        if current_user.get("role") != role:
+            raise HTTPException(status_code=403, detail="Permission denied")
+        return current_user
+    return role_checker
 
 
 # # dependencies
