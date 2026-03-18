@@ -1,7 +1,7 @@
 
 # pydantic schemas for product
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator , ConfigDict
 from datetime import datetime
 from typing import Optional
 
@@ -50,11 +50,7 @@ class ProductsResponse(BaseModel):
         "from_attributes": True
     }
 
-class CreateProductsResponse(BaseModel):
-    products : ProductResponse
-    message : str
 
-    model_config = { "from_attributes": True }
 
 
 class CategoriesResponse(BaseModel):
@@ -81,6 +77,35 @@ class ProductGenerators(ProductRequest):
     reviews : int = Field(default=0)
     created_at : datetime = Field(default_factory=datetime.now)
 
-class CreateProductResponse(ProductGenerators):
-# Yet to be implemented
+class CreateProductResponse(BaseModel):
+    products : ProductResponse
+    message : str
+
+    model_config = { "from_attributes": True }
+
+class UpdateProductRequest(BaseModel):
+    name : Optional[str] = None
+    category : Optional[str] = None
+    price : Optional[float] = None
+    stock : Optional[int] = None
+    emoji : Optional[str] = None
+    description : Optional[str] = None
+
+    model_config = ConfigDict(extra="forbid")   # prevents unknown fields
+
+
+class UpdateProductRequestNotUsed(BaseModel):
+    name: Optional[str] = Field(None,  json_schema_extra={"example": None})
+    category: Optional[str] = Field(None,   json_schema_extra={"example": None})
+    price: Optional[float] = Field(None,   json_schema_extra={"example": None})
+    stock: Optional[int] = Field(None,   json_schema_extra={"example": None})
+    emoji: Optional[str] = Field(None,   json_schema_extra={"example": None})
+    description: Optional[str] = Field(None,   json_schema_extra={"example": None})
+
+    model_config = ConfigDict(
+        extra="forbid",
+        json_schema_extra={"example": {}}
+    )
+
+class DeleteProductResponse(BaseModel):
     message : str

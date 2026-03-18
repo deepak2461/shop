@@ -63,11 +63,11 @@ def decode_access_token(token: str):
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     payload = decode_access_token(token)
-    print("##" * 50)
-    print(token)
-    print("##" * 50)
-    print(payload)
-    print("##" * 50)
+    # print("##" * 50)
+    # print(token)
+    # print("##" * 50)
+    # print(payload)
+    # print("##" * 50)
     if payload is None:
         raise HTTPException(status_code=401, detail="Invalid Credentials")
     return payload
