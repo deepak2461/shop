@@ -22,7 +22,7 @@ from services.product import *
 from auth.security import require_admin
 
 
-router = APIRouter(prefix="/products" , tags=["products"])
+router = APIRouter(prefix="/products" , tags=["Products"])
 
 
 @router.get("/", response_model=ProductListResponse)

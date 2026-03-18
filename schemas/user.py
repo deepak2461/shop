@@ -87,3 +87,24 @@ class User(BaseModel):
 class UserCreate(BaseModel):
 
 '''
+
+class CustomerResponse(BaseModel):
+    id : int
+    name  : str
+    username : str
+    email : str
+    role : enums.UserRole
+    created_at : datetime
+
+    model_config = {
+        "from_attributes": True
+    }
+
+class CustomerResponseV(BaseModel):
+    data : list[CustomerResponse]
+    message : str
+    
+
+
+
+

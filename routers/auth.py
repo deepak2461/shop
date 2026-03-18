@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Optional
 
-router = APIRouter(prefix="/auth"  , tags=["auth"])
+router = APIRouter(prefix="/auth"  , tags=["Auth"])
 
 @router.post("/login" , response_model = UserSigninRes)
 def login( request_model : OAuth2PasswordRequestForm = Depends() , db : Session = Depends(get_db)):   # def login(request_model : UserSigninReq ,role : str, email:str, password:str, db : Session = Depends(get_db)):

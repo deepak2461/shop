@@ -13,7 +13,7 @@ from typing import Optional
 from services.order import *
 from auth.security import get_current_user , require_role , require_admin
 
-router = APIRouter(prefix="/orders" , tags=["orders"])
+router = APIRouter(prefix="/orders" , tags=["Orders"])
 
 
 @router.get("/", response_model=OrderListResponse)
