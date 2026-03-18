@@ -6,7 +6,7 @@ from sqlalchemy import pool
 from alembic import context
 
 from db.base import Base                        #### Added
-from models import users  , category  , product                    #### Added (Need to keep updating)
+from models import users  , category  , product , orders                  #### Added (Need to keep updating)
 from db.session import DATABASE_URL             #### Added
 
 # this is the Alembic Config object, which provides

@@ -3,6 +3,7 @@
 
 from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime
+from sqlalchemy.orm import relationship
 
 import enums
 from db.base import Base
@@ -18,3 +19,4 @@ class Users(Base):
     role : enums.UserRole = Column(String, nullable=False, default="customer")
     created_at = Column(DateTime, default=datetime.now())
 
+    orders = relationship("Order", back_populates="user")
