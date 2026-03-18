@@ -21,12 +21,12 @@ class OrderItemResponse(OrderItemCreate):
 
 class OrderCreate(BaseModel):
     items : List[OrderItemCreate]
-    message : str
+    #message : str
 
 class OrderResponse(BaseModel):
     id : str
-    customer : str
-    email : str
+    customer_name : str
+    customer_email : str
     items : List[OrderItemResponse]
     item_count : int
     total : float
@@ -35,9 +35,10 @@ class OrderResponse(BaseModel):
 
     model_config = {"from_attributes": True}
 
-class OrderResponseV(OrderResponse):
+class OrderResponseV(BaseModel):
+    data : OrderResponse
     message : str
-    
+
 class OrderStatusUpdate(BaseModel):
     status : enums.OrderStatus
 
@@ -45,7 +46,8 @@ class OrderListResponse(BaseModel):
     orders : List[OrderResponse]
     total : int
     page : int
-    limit : int
+    pages : int
 
-class OrderListResponseV(OrderListResponse):
+class OrderListResponseV(BaseModel):
+    orders : OrderListResponse
     message : str

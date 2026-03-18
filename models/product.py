@@ -43,4 +43,5 @@ class Product(Base):
     created_at = Column(DateTime, nullable=True,default=datetime.now)
 
     category = relationship("Category", back_populates="products")
-
+    order_items = relationship("OrderItem", back_populates="product")
+    reviews_list = relationship("Review", back_populates="product")

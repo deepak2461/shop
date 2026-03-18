@@ -5,4 +5,4 @@ from sqlalchemy import MetaData
 metadata = MetaData(schema="shop")
 Base = declarative_base(metadata = metadata)
 
-
+# import models

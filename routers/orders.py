@@ -16,7 +16,7 @@ from auth.security import get_current_user , require_role , require_admin
 router = APIRouter(prefix="/orders" , tags=["orders"])
 
 
-@router.get("/", response_model=OrderListResponseV)
+@router.get("/", response_model=OrderListResponse)
 def list_orders(
     status: Optional[str] = None,
     customer_id: Optional[int] = None,
@@ -29,11 +29,14 @@ def list_orders(
         if status or customer_id:
             raise HTTPException(403, "Query parameters allowed for admin role only")
     data =  get_orders(db, current_user, status, customer_id, page, limit)
-    return {"data":data , "message":f"SUCCESS -- {data.total} orders fetched Successfully"}
+    #return { **data.model_dump() , "message":f"SUCCESS -- {data.total} orders fetched Successfully"}
+    #return {"order": data, "message":f"SUCCESS -- {data.total} orders fetched Successfully"}    # use response_model=OrderListResponseV 
+    return data      # use response_model=OrderListResponse
+
+#from schemas.gen import BaseResponseSchema
 
 
-
-@router.post("/", response_model=OrderResponseV, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=OrderResponseV)
 def create_order(
     order_data: OrderCreate,
     db: Session = Depends(get_db),
@@ -43,7 +46,7 @@ def create_order(
     if current_user["role"] != "customer":
         raise HTTPException(403, "Only customers can place orders")
     
-    user_obj = db.query(Users).filter(Users.id == current_user["id"]).first()
+    user_obj = db.query(Users).filter(Users.email == current_user["email"]).first()
     if not user_obj:
         raise HTTPException(401, "User not found")
     

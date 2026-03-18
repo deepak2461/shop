@@ -19,7 +19,8 @@ class OrderItem(Base):
     name = Column(String, nullable=False)
     price = Column(Float, nullable=False)
     quantity = Column(Integer, nullable=False)
-    #product = relationship("Product", back_populates="order_items")
+    subtotal = Column(Float, nullable=False)
+    product = relationship("Product", back_populates="order_items")
     order = relationship("Order", back_populates="items")
 
 
@@ -38,6 +39,6 @@ class Order(Base):
     created_at  = Column(DateTime, server_default=func.now(), nullable=False)
 
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")     # Without delete-orphan, removing an item from order.items would just set its order_id to NULL → leaving orphaned rows (bad data).
-    user = relationship("User", back_populates="orders")
+    user = relationship("Users", back_populates="orders")
 
 

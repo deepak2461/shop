@@ -20,3 +20,4 @@ class Users(Base):
     created_at = Column(DateTime, default=datetime.now())
 
     orders = relationship("Order", back_populates="user")
+    reviews = relationship("Review", back_populates="user")

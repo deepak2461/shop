@@ -66,7 +66,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     # print("##" * 50)
     # print(token)
     # print("##" * 50)
-    # print(payload)
+    # print(payload)   # {'email': 'usernine', 'password': 'usernine', 'role': 'customer', 'exp': 1773873039}
     # print("##" * 50)
     if payload is None:
         raise HTTPException(status_code=401, detail="Invalid Credentials")
