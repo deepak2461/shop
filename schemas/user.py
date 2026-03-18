@@ -31,8 +31,13 @@ class UserRegisterReq(BaseModel):
     }
 
 
-class UserSigninRes(schemas.gen.BaseResponseSchema):
-    token : str
+# class UserSigninRes(schemas.gen.BaseResponseSchema):
+#     token : str
+
+class UserSigninRes(BaseModel):
+    access_token : str
+    token_type : str
+
 
 class UserRegisterRes(schemas.gen.BaseResponseSchema):
     token : str

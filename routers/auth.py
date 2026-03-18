@@ -17,7 +17,7 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Optional
 
-router = APIRouter(prefix="/auth")
+router = APIRouter(prefix="/auth"  , tags=["auth"])
 
 @router.post("/login" , response_model = UserSigninRes)
 def login( request_model : OAuth2PasswordRequestForm = Depends() , db : Session = Depends(get_db)):   # def login(request_model : UserSigninReq ,role : str, email:str, password:str, db : Session = Depends(get_db)):
@@ -31,11 +31,11 @@ def login( request_model : OAuth2PasswordRequestForm = Depends() , db : Session 
         if not verify_password(password, user.password):
             raise HTTPException(status_code=401, detail="Invalid Credentials")
         else:
-            data = {"email": email} 
+            data = {"email": email , "password": password , "role": user.role} 
             access_token = create_access_token(data)          #access_token = create_access_token(request_model.model_dump())
 
-            return {"data": data, "message": f"User logged in successfully","token": access_token}    #return {"data": request_model.model_dump(exclude={"password"}), "message": f"User logged in successfully","token": access_token}
-
+            #return {"data": data, "message": f"User logged in successfully","token": access_token}    #return {"data": request_model.model_dump(exclude={"password"}), "message": f"User logged in successfully","token": access_token}
+            return {"access_token" : access_token , "token_type" : "bearer"}
             
 
 

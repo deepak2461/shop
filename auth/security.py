@@ -63,12 +63,18 @@ def decode_access_token(token: str):
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     payload = decode_access_token(token)
+    print("##" * 50)
+    print(token)
+    print("##" * 50)
+    print(payload)
+    print("##" * 50)
     if payload is None:
         raise HTTPException(status_code=401, detail="Invalid Credentials")
     return payload
 
 def require_admin(current_user=Depends(get_current_user)):
     if current_user.get("role") != "admin":
+        print(current_user.get("role"))
         raise HTTPException(status_code=403, detail = " Admin privileges required")
     return current_user
 

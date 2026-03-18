@@ -96,7 +96,7 @@ def product_create(db: Session, product: Product):
         emoji = product.emoji,
         description = product.description,
     )
-
+    new_product.id = None               # Added for letting db decide the id (reg. manual additions in db)
     db.add(new_product)
     db.commit()
     db.refresh(new_product)

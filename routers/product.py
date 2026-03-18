@@ -14,12 +14,12 @@ from sqlalchemy.orm import Session
 from typing import List
 
 
-from schemas.product import ProductResponse, ProductListResponse , ProductsResponse , CategoriesResponse  , ProductRequest
+from schemas.product import ProductResponse, ProductListResponse , ProductsResponse , CategoriesResponse  , ProductRequest , CreateProductsResponse
 from db.session import get_db
 from services.product import get_products , show_product_by_id , show_product_by_category , list_categories , product_create
 from auth.security import require_admin
 
-router = APIRouter(prefix="/products")
+router = APIRouter(prefix="/products" , tags=["products"])
 
 
 @router.get("/", response_model=ProductListResponse)
@@ -61,7 +61,7 @@ def get_products_by_category(category: str, db: Session = Depends(get_db)):
 
 # Auth: Protected — Admin JWT required
 
-@router.post("/", response_model=ProductsResponse)
+@router.post("/", response_model=CreateProductsResponse)
 def create_product(product: ProductRequest, db: Session = Depends(get_db) , current_user = Depends(require_admin)):
     product = product_create(db, product)
     return {"products": product , "message": f"Success -- Crated product with id - {product.id}"}

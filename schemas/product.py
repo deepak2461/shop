@@ -50,6 +50,11 @@ class ProductsResponse(BaseModel):
         "from_attributes": True
     }
 
+class CreateProductsResponse(BaseModel):
+    products : ProductResponse
+    message : str
+
+    model_config = { "from_attributes": True }
 
 
 class CategoriesResponse(BaseModel):
@@ -77,5 +82,5 @@ class ProductGenerators(ProductRequest):
     created_at : datetime = Field(default_factory=datetime.now)
 
 class CreateProductResponse(ProductGenerators):
-
+# Yet to be implemented
     message : str
