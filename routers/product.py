@@ -71,7 +71,7 @@ def create_product(product: ProductRequest, db: Session = Depends(get_db) , curr
 
 
 @router.put("/{id}", response_model=CreateProductResponse)
-def update_product(id: int, product: UpdateProductRequest, db: Session = Depends(get_db) , current_user = Depends(require_admin)):
+def update_product(id: int, product: UpdateProductRequest, db: Session = Depends(get_db) , current_user = Depends(require_admin)):   # if current_user  is not required  can add it as dependency in constructor check analytics.py
     product = product_update(db, product , id)
     return {"products": product , "message": f"Success -- Updated product with id - {product.id}"}
 
