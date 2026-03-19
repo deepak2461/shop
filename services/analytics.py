@@ -17,12 +17,12 @@ def get_sales(sales_data: SalesRequest , db: Session):
     stats = db.query(
         func.sum(Order.total).label("total_sales"),
         func.count(Order.id).label("total_orders"),
-        func.count(distinct(Order.user_id)).label("total_customers_who_ordered")
+        #func.count(distinct(Order.user_id)).label("total_customers_who_ordered")
     ).filter(Order.created_at.between(sales_data.start_date , sales_data.end_date)).first()
 
     total_sales = stats.total_sales or 0
     total_orders = stats.total_orders or 0
-    total_customers_who_ordered = stats.total_customers_who_ordered or 0
+    #total_customers_who_ordered = stats.total_customers_who_ordered or 0
     avg_order = (total_sales / total_orders) if total_orders > 0 else 0
 
     data = SalesResponse(total_sales=total_sales , total_orders=total_orders , avg_order=avg_order)
